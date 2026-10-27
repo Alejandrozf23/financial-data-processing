@@ -1,0 +1,5 @@
+product_id,product_name,product_type
+P001,Synthetic Savings Account,Savings
+P002,Synthetic Consumer Credit,Credit
+P003,Synthetic Investment Fund,Investment
+P004,Synthetic Term Deposit,Investment

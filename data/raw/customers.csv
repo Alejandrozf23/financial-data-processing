@@ -1,0 +1,9 @@
+customer_id,customer_name,segment,region
+C001,Cliente Ficticio 001,Premium,North
+C002,Cliente Ficticio 002,Retail,Center
+C003,Cliente Ficticio 003,Premium,South
+C004,Cliente Ficticio 004,Retail,North
+C005,Cliente Ficticio 005,Business,Center
+C006,Cliente Ficticio 006,Business,South
+C007,Cliente Ficticio 007,Premium,Center
+C008,Cliente Ficticio 008,Retail,South
