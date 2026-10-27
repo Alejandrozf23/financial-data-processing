@@ -25,3 +25,6 @@ where = ["src"]
 testpaths = ["tests"]
 pythonpath = ["src"]
 addopts = "-ra"
+
+[project.scripts]
+financial-process = "financial_processing.main:main"

@@ -20,6 +20,15 @@ from financial_processing.validation import (
     validate_datasets,
 )
 
+from financial_processing.cleaning import (
+    CleaningReport,
+    DataCleaningError,
+    normalize_text_columns,
+    remove_exact_duplicates,
+    clean_dataset,
+    clean_datasets,
+)
+
 __all__ = [
     "DatasetPaths",
     "load_csv",
@@ -35,4 +44,10 @@ __all__ = [
     "validate_positive_amounts",
     "validate_dates",
     "validate_datasets",
+    "CleaningReport",
+    "DataCleaningError",
+    "normalize_text_columns",
+    "remove_exact_duplicates",
+    "clean_dataset",
+    "clean_datasets",
 ]

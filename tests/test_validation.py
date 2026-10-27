@@ -195,9 +195,10 @@ def test_invalid_transaction_date(valid_datasets):
 
 
 def test_optional_transaction_date(valid_datasets):
-    valid_datasets["transactions"].drop(
-        columns=["transaction_date"],
-        inplace=True,
+    valid_datasets["transactions"] = (
+        valid_datasets["transactions"].drop(
+            columns=["transaction_date"]
+        )
     )
 
     assert validate_datasets(valid_datasets) is None
