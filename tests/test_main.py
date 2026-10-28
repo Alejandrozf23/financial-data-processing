@@ -39,13 +39,14 @@ def sample_raw_dir(tmp_path: Path) -> Path:
 
 
 def test_run_pipeline_success(sample_raw_dir, capsys):
-    """Verify the complete pipeline executes successfully."""
+    """Verify the pipeline includes transaction enrichment."""
     result = run_pipeline(sample_raw_dir)
 
     assert result == {
         "customers": 2,
         "products": 2,
         "transactions": 2,
+        "enriched_transactions": 2,
     }
 
     captured = capsys.readouterr()
@@ -56,7 +57,7 @@ def test_run_pipeline_success(sample_raw_dir, capsys):
     )
 
     assert "customers: input=2, output=2" in captured.out
-
+    assert "enriched_transactions: rows=2" in captured.out
 
 def test_run_pipeline_missing_file(tmp_path):
     """Verify missing input files stop pipeline execution."""
@@ -145,3 +146,22 @@ def test_main_with_duplicate_removal(sample_raw_dir):
     ])
 
     assert exit_code == 0
+
+def test_pipeline_fails_when_customer_catalog_has_duplicates(
+    sample_raw_dir,
+):
+    """Reject duplicate customer keys before data enrichment."""
+    customers = sample_raw_dir / "customers.csv"
+
+    customers.write_text(
+        "customer_id,segment,region\n"
+        "C001,Premium,North\n"
+        "C001,Retail,South\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(
+        DataValidationError,
+        match="duplicate 'customer_id'",
+    ):
+        run_pipeline(sample_raw_dir)

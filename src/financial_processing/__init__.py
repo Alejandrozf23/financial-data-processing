@@ -29,6 +29,13 @@ from financial_processing.cleaning import (
     clean_datasets,
 )
 
+from financial_processing.transformations import (
+    DataTransformationError,
+    merge_customers,
+    merge_products,
+    enrich_transactions,
+)
+
 __all__ = [
     "DatasetPaths",
     "load_csv",
