@@ -47,6 +47,15 @@ from financial_processing.analytics import (
     calculate_all_metrics,
 )
 
+from financial_processing.export import (
+    DataExportError,
+    ExportReport,
+    prepare_output_directory,
+    export_dataframe,
+    export_overall_metrics,
+    export_pipeline_results,
+)
+
 __all__ = [
     "DatasetPaths",
     "load_csv",
@@ -76,4 +85,10 @@ __all__ = [
     "calculate_segment_metrics",
     "calculate_overall_metrics",
     "calculate_all_metrics",
+    "DataExportError",
+    "ExportReport",
+    "prepare_output_directory",
+    "export_dataframe",
+    "export_overall_metrics",
+    "export_pipeline_results",
 ]

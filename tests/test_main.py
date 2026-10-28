@@ -184,3 +184,73 @@ def test_pipeline_calculates_financial_analytics(
     # 12500.50 + 7800.00 = 20300.50
     assert "total_amount=20300.50" in output
     assert "average_amount=10150.25" in output
+
+def test_pipeline_exports_nine_files(
+    sample_raw_dir,
+    tmp_path,
+    capsys,
+):
+    """Verify the complete pipeline generates nine artifacts."""
+    output_dir = tmp_path / "processed"
+
+    result = run_pipeline(
+        sample_raw_dir,
+        output_dir=output_dir,
+    )
+
+    assert result["enriched_transactions"] == 2
+
+    expected_files = {
+        "enriched_transactions.csv",
+        "enriched_transactions.parquet",
+        "customer_metrics.csv",
+        "customer_metrics.parquet",
+        "product_metrics.csv",
+        "product_metrics.parquet",
+        "segment_metrics.csv",
+        "segment_metrics.parquet",
+        "overall_metrics.json",
+    }
+
+    actual_files = {
+        path.name
+        for path in output_dir.iterdir()
+        if path.is_file()
+    }
+
+    assert actual_files == expected_files
+
+    output = capsys.readouterr().out
+    assert "Export completed: 9 files" in output
+
+
+def test_pipeline_without_output_does_not_export(
+    sample_raw_dir,
+    tmp_path,
+):
+    """Verify export is optional."""
+    output_dir = tmp_path / "processed"
+
+    result = run_pipeline(sample_raw_dir)
+
+    assert result["enriched_transactions"] == 2
+    assert not output_dir.exists()
+
+
+def test_cli_supports_export(
+    sample_raw_dir,
+    tmp_path,
+):
+    """Verify the command-line export argument."""
+    output_dir = tmp_path / "results"
+
+    exit_code = main([
+        "--raw-dir",
+        str(sample_raw_dir),
+        "--output-dir",
+        str(output_dir),
+    ])
+
+    assert exit_code == 0
+    assert (output_dir / "overall_metrics.json").exists()
+    assert (output_dir / "enriched_transactions.parquet").exists()
