@@ -165,3 +165,22 @@ def test_pipeline_fails_when_customer_catalog_has_duplicates(
         match="duplicate 'customer_id'",
     ):
         run_pipeline(sample_raw_dir)
+
+def test_pipeline_calculates_financial_analytics(
+    sample_raw_dir,
+    capsys,
+):
+    """Verify that the pipeline computes and prints analytics."""
+    result = run_pipeline(sample_raw_dir)
+
+    output = capsys.readouterr().out
+
+    assert result["enriched_transactions"] == 2
+
+    assert "Financial analytics:" in output
+    assert "transaction_count=2" in output
+    assert "unique_customers=2" in output
+
+    # 12500.50 + 7800.00 = 20300.50
+    assert "total_amount=20300.50" in output
+    assert "average_amount=10150.25" in output

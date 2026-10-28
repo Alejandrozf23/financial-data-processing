@@ -36,6 +36,17 @@ from financial_processing.transformations import (
     enrich_transactions,
 )
 
+from financial_processing.analytics import (
+    DataAnalyticsError,
+    OverallMetrics,
+    validate_analytics_input,
+    calculate_customer_metrics,
+    calculate_product_metrics,
+    calculate_segment_metrics,
+    calculate_overall_metrics,
+    calculate_all_metrics,
+)
+
 __all__ = [
     "DatasetPaths",
     "load_csv",
@@ -57,4 +68,12 @@ __all__ = [
     "remove_exact_duplicates",
     "clean_dataset",
     "clean_datasets",
+    "DataAnalyticsError",
+    "OverallMetrics",
+    "validate_analytics_input",
+    "calculate_customer_metrics",
+    "calculate_product_metrics",
+    "calculate_segment_metrics",
+    "calculate_overall_metrics",
+    "calculate_all_metrics",
 ]

@@ -4,6 +4,7 @@ import argparse
 from collections.abc import Sequence
 from pathlib import Path
 
+from financial_processing.analytics import calculate_all_metrics
 from financial_processing.cleaning import clean_datasets
 from financial_processing.ingestion import load_datasets
 from financial_processing.transformations import enrich_transactions
@@ -16,41 +17,47 @@ def run_pipeline(
     drop_exact_duplicates: bool = False,
 ) -> dict[str, int]:
     """
-    Execute ingestion, cleaning, validation and enrichment.
+    Run ingestion, cleaning, validation, enrichment and analytics.
 
     Args:
         raw_dir: Directory containing input CSV files.
-        drop_exact_duplicates: Whether to remove identical rows.
+        drop_exact_duplicates: Remove fully identical records
+            before validation when explicitly enabled.
 
     Returns:
-        Row counts of the validated input datasets and enriched
-        transactions.
+        Row counts for validated datasets and enriched transactions.
 
     Raises:
-        FileNotFoundError: If a source file does not exist.
-        ValueError: If a dataset fails loading, cleaning,
-            validation or transformation.
+        FileNotFoundError: When an input CSV is missing.
+        ValueError: When an operation rejects invalid data.
     """
-    # PFD-02: Ingestion
+    # PFD-02: Read source CSV files.
     raw_datasets = load_datasets(raw_dir)
 
-    # PFD-04: Cleaning
-    cleaned_datasets, reports = clean_datasets(
+    # PFD-04: Normalize text and optionally remove exact duplicates.
+    cleaned_datasets, cleaning_reports = clean_datasets(
         raw_datasets,
         drop_exact_duplicates=drop_exact_duplicates,
     )
 
-    # PFD-03: Data quality validation
+    # PFD-03: Validate schemas, keys, amounts and relationships.
     validate_datasets(cleaned_datasets)
 
-    # PFD-05: Data enrichment
+    # PFD-05: Enrich transactions using controlled Pandas joins.
     enriched_transactions = enrich_transactions(
         cleaned_datasets
     )
 
+    # PFD-06: Calculate financial metrics.
+    analytics_reports = calculate_all_metrics(
+        enriched_transactions
+    )
+
+    overall = analytics_reports["overall"]
+
     print("Financial data pipeline completed successfully.")
 
-    for name, report in reports.items():
+    for name, report in cleaning_reports.items():
         print(
             f"{name}: "
             f"input={report.input_rows}, "
@@ -64,6 +71,12 @@ def run_pipeline(
         f"columns={len(enriched_transactions.columns)}"
     )
 
+    print("Financial analytics:")
+    print(f"  transaction_count={overall.transaction_count}")
+    print(f"  unique_customers={overall.unique_customers}")
+    print(f"  total_amount={overall.total_amount:.2f}")
+    print(f"  average_amount={overall.average_amount:.2f}")
+
     return {
         **{
             name: len(dataframe)
@@ -74,7 +87,7 @@ def run_pipeline(
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    """Parse CLI arguments and run the financial pipeline."""
+    """Parse CLI arguments and execute the pipeline."""
     parser = argparse.ArgumentParser(
         description="Financial data processing pipeline"
     )
